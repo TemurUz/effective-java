@@ -1,2 +1,3 @@
-# effective-java
-best practice
+# Effective Java, Third Edition
+
+Best practices for
