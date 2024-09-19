@@ -59,3 +59,74 @@ public class StaticFactoryMethods {
 
 4. A fourth advantage of static factories is that the class of the returned
    object can vary from call to call as a function of the input parameters.
+
+5. A fifth advantage of static factories is that the class of the returned object
+   need not exist when the class containing the method is written.
+
+#### For Example
+
+* Service Interfeys: Bu mijoz foydalanishi mumkin bo'lgan xizmatning asosiy interfeysi.
+```java
+public interface PaymentService {
+    void processPayment(double amount);
+}
+```
+
+* Service Provider: Bu esa implementatsiya bo'lib, biz turli provayderlarni (masalan, PayPal, Stripe) yaratishimiz mumkin.
+
+```java
+public class PayPalPaymentService implements PaymentService {
+    @Override
+    public void processPayment(double amount) {
+        System.out.println("PayPal orqali to'lov amalga oshirildi: " + amount);
+    }
+}
+
+public class StripePaymentService implements PaymentService {
+    @Override
+    public void processPayment(double amount) {
+        System.out.println("Stripe orqali to'lov amalga oshirildi: " + amount);
+    }
+}
+```
+
+* Static Factory Method: Bu metod mijozlarga implementatsiyani tanlashga imkon beradi. Bu metod yozilgan vaqtda ham, u kelajakda ko'proq xizmatlar qo'shilishiga tayyor bo'ladi.
+
+```java
+public class PaymentServiceFactory {
+    public static PaymentService getPaymentService(String provider) {
+        switch (provider) {
+            case "PayPal":
+                return new PayPalPaymentService();
+            case "Stripe":
+                return new StripePaymentService();
+            default:
+                throw new IllegalArgumentException("Not known provider: " + provider);
+        }
+    }
+}
+```
+
+* Qo'llanishi: Mijoz static factory orqali xohlagan provayderni tanlashi mumkin
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        PaymentService paymentService = PaymentServiceFactory.getPaymentService("PayPal");
+        paymentService.processPayment(100.0);
+        
+        PaymentService anotherService = PaymentServiceFactory.getPaymentService("Stripe");
+        anotherService.processPayment(200.0);
+    }
+}
+
+```
+
+#### Explanation
+
+* Static factory metoddan foydalangan holda `PaymentService` yaratamiz.
+* `PayPal` va `Stripe` provayderlari yaratib qo'yilgan, lekin biz yangi provayderlarni 
+qo'sha olamiz va bu bilan `PaymentServiceFactory`ni o'zgartirishimiz shart bo'lmaydi. 
+Masalan, `Square` yoki boshqa to'lov xizmatlarini qo'shishimiz mumkin.
+
+<b>In Summary. Bu static factory metod ining asosiy afzalliklaridan biridir — u yozilgan paytda barcha mumkin bo'lgan calass larni bilish shart emas.</b>
